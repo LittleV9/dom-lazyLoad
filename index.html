@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分屏加载</title>
+    <link rel="stylesheet" href="css/css.css"/>
+</head>
+<body>
+<img src="img/a1.jpg" alt=""/><br/>
+<img src="img/a1.jpg" alt=""/><br/>
+<img src="img/a1.jpg" alt=""/><br/>
+
+<div class="wrap">
+    <textarea class="img_load none">
+        <img src="img/a1.jpg" alt=""/><br/>
+    </textarea>
+</div>
+<!--轮播-->
+<div class="buyer-show-slide">
+    <a href="javascript:;" rel="nofollow" target="_blank" class="buyer-show-cover"></a>
+        <textarea class="js_buyShowslide none">
+            <ul class="slider">
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+                <li><a href="javascript:;"><img src="img/flower.jpg" height="210" rel="nofollow"/></a></li>
+            </ul>
+        </textarea>
+</div>
+
+<script type="text/javascript" src="js/jquery-1.12.0.js"></script>
+<script type="text/javascript" src="js/jquery.flexslider.min.js"></script>
+<script>
+    //定义空间命名
+    var GLOBAL = {};  //window
+    $(function () {
+        GLOBAL.lazyLoad = {
+            //循环每一个指定textarea,如果在可见区域就写入html，如果有回调函数执行回调函数
+            eachElem: function ($elem, scollTop, windowH, callback) {
+                $elem.each(function (index, el) {
+                    var $this = $(el);
+                    var elemTop = $this.parent().offset().top;
+                    var htmls = $this.text();
+
+                    if ((elemTop > scollTop - 100) && (elemTop - scollTop < windowH)) {
+                        if ($this.data("addYet") != 1) {
+                            $this.parent().append((htmls));
+                            $this.data("addYet", "1");
+
+                            if (callback && $.type(callback) == "function") {
+                                callback(htmls, $this.parent());
+                            }
+                        }
+                    }
+                });
+            },
+            //动态创建dom元素
+            creatEle: function (targetElm, callback) {
+                var $elem = $.type(targetElm) == "string" ? $(targetElm) : $("textarea.js_addToDom"),
+                        $window = $(window),
+                        windowH = $window.height(),
+                        that = this;
+                var _blank = null;
+                that.eachElem($elem, $window.scrollTop(), windowH, callback);
+
+                $window.scroll(function () {
+                    var scrollTop = $(this).scrollTop();
+
+                    if (_blank) {
+                        clearTimeout(_blank);
+                    }
+                    _blank = setTimeout(function () {
+                        that.eachElem($elem, scrollTop, windowH, callback);
+                    }, 300);
+                });
+            }
+        }
+        GLOBAL.lazyLoad.creatEle("textarea.img_load");
+
+//            加载轮播
+        function initBuyerShowImg(htmls, $warp) {
+            $warp.flexslider({
+                namespace: "",
+                animation: "slide",
+                selector: ".slider > li",
+                pauseOnAction: false,
+                itemWidth: 150,
+                controlNav: false,
+                animationLoop: false
+            });
+        }
+
+        GLOBAL.lazyLoad.creatEle("textarea.js_buyShowslide", initBuyerShowImg);
+    });
+</script>
+</body>
+</html>
